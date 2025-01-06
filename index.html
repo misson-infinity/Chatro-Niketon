@@ -1,30 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ছাত্র নিকেতন</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+    <title>ছাত্র নিকেতন</title>
 </head>
 <body>
-  <header>
     <h1>ছাত্র নিকেতন</h1>
-    <nav>
-      <a href="index.html">হোম</a>
-      <a href="login.html">লগইন</a>
-      <a href="signup.html">সাইন আপ</a>
-    </nav>
-  </header>
-  
-  <main>
-    <section>
-      <h2>মেস ম্যানেজমেন্ট ওয়েবসাইট</h2>
-      <p>আপনার মেসের সকল তথ্য এক জায়গায় পরিচালনা করুন। সদস্যগণ লগইন বা সাইন আপ করতে পারবেন, এবং এডমিন সকল তথ্য আপডেট করবেন।</p>
-    </section>
-  </main>
+    
+    <div class="market-info">
+        <h2>বাজারের তথ্য</h2>
+        <div id="market-list">
+            <!-- এখানে বাজারের তথ্য যোগ হবে -->
+        </div>
+    </div>
 
-  <footer>
-    <p>© ২০২৫ ছাত্র নিকেতন</p>
-  </footer>
+    <div class="meal-poll">
+        <h2>খাবারের মিল</h2>
+        <form id="meal-form">
+            <label for="member">সদস্য নির্বাচন করুন:</label>
+            <select id="member" required>
+                <option value="হাবিব">হাবিব</option>
+                <option value="শামসুল">শামসুল</option>
+                <option value="রাজু">রাজু</option>
+                <option value="সায়েম">সায়েম</option>
+                <option value="শিপন">শিপন</option>
+            </select>
+            <br>
+            <label>সকাল:</label>
+            <input type="checkbox" class="meal-checkbox" data-meal="half">
+            <label>বিকাল:</label>
+            <input type="checkbox" class="meal-checkbox" data-meal="full">
+            <label>রাত:</label>
+            <input type="checkbox" class="meal-checkbox" data-meal="full">
+            <br>
+            <button type="submit">জমা দিন</button>
+        </form>
+    </div>
+
+    <button id="members-button">সদস্য</button>
+
+    <script>
+        document.getElementById('members-button').addEventListener('click', function() {
+            window.location.href = 'member.html';
+        });
+
+        document.getElementById('meal-form').addEventListener('submit', function(e) {
+            e.preventDefault(); // ফর্ম জমা দেওয়া বন্ধ করুন
+
+            const member = document.getElementById('member').value;
+            const meals = document.querySelectorAll('.meal-checkbox');
+            let mealCount = 0;
+
+            meals.forEach(meal => {
+                if (meal.checked) {
+                    if (meal.dataset.meal === "half") {
+                        mealCount += 0.5; // হাফ মিল
+                    } else {
+                        mealCount += 1; // পূর্ণ মিল
+                    }
+                }
+            });
+
+            // বাজারের তথ্য যোগ করুন
+            const marketList = document.getElementById('market-list');
+            const newEntry = document.createElement('div');
+            newEntry.textContent = `${member} এর মিল: ${mealCount} (সকাল: ${meals[0].checked ? "হ্যাঁ" : "না"}, বিকাল: ${meals[1].checked ? "হ্যাঁ" : "না"}, রাত: ${meals[2].checked ? "হ্যাঁ" : "না"})`;
+            marketList.appendChild(newEntry);
+
+            // ফর্ম পুনরায় সেট করুন
+            document.getElementById('meal-form').reset();
+        });
+    </script>
 </body>
-</html>
+  </html>
