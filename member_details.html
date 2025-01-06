@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>সদস্যের বিস্তারিত</title>
+</head>
+<body>
+    <h1 id="member-name"></h1>
+    <div id="expenses">
+        <h2>খরচের বিস্তারিত</h2>
+        <!-- এখানে সদস্যের খরচের তথ্য যোগ হবে -->
+    </div>
+    <button onclick="window.history.back()">ফিরে যান</button>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const memberName = urlParams.get('member');
+        document.getElementById('member-name').innerText = memberName;
+
+        // সদস্যের খরচের তথ্য এখানে যোগ করুন
+        const expenses = {
+            'হাবিব': 'বাজার: 500, খাবার: 300',
+            'শামসুল': 'বাজার: 400, খাবার: 200',
+            'রাজু': 'বাজার: 600, খাবার: 350',
+            'সায়েম': 'বাজার: 450, খাবার: 250',
+            'শিপন': 'বাজার: 550, খাবার: 300',
+        };
+
+        document.getElementById('expenses').innerText = expenses[memberName];
+    </script>
+</body>
+</html>
