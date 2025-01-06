@@ -1,32 +1,46 @@
-const members = [
-    { username: 'student1', password: 'password1', name: 'মাহি' },
-    { username: 'student2', password: 'password2', name: 'রহিম' },
-    { username: 'student3', password: 'password3', name: 'করিম' }
-];
+// সাইনআপ ফর্ম সাবমিট ইভেন্ট
+document.getElementById('signupForm').addEventListener('submit', function(event) {
+    event.preventDefault();
 
+    const username = document.getElementById('newUsername').value;
+    const password = document.getElementById('newPassword').value;
+    const name = document.getElementById('newName').value;
+
+    // লোকাল স্টোরেজ থেকে পুরানো ডেটা আনছে
+    const storedMembers = JSON.parse(localStorage.getItem('members')) || [];
+
+    // নতুন ব্যবহারকারী যোগ করছে
+    storedMembers.push({ username, password, name, isAdmin: false });
+
+    // আপডেট হওয়া ডেটা লোকাল স্টোরেজে সংরক্ষণ করছে
+    localStorage.setItem('members', JSON.stringify(storedMembers));
+
+    alert('সাইন আপ সফল!');
+    document.getElementById('signup-container').classList.add('hidden');
+    document.getElementById('auth-container').classList.remove('hidden');
+});
+
+// লগইন ফর্ম সাবমিট ইভেন্ট
 document.getElementById('loginForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
-    
-    const member = members.find(m => m.username === username && m.password === password);
+
+    // লোকাল স্টোরেজ থেকে ডেটা আনছে
+    const storedMembers = JSON.parse(localStorage.getItem('members')) || [];
+
+    const member = storedMembers.find(m => m.username === username && m.password === password);
 
     if (member) {
         document.getElementById('loginForm').classList.add('hidden');
         document.getElementById('dashboard').classList.remove('hidden');
         document.getElementById('memberName').textContent = member.name;
+
+        if (member.isAdmin) {
+            console.log('Admin logged in');
+        }
     } else {
         document.getElementById('error-message').classList.remove('hidden');
     }
-});
-
-document.getElementById('logoutBtn').addEventListener('click', function() {
-    document.getElementById('loginForm').classList.remove('hidden');
-    document.getElementById('dashboard').classList.add('hidden');
-    document.getElementById('error-message').classList.add('hidden');
-});
-
-document.getElementById('viewInfoBtn').addEventListener('click', function() {
-    alert('তোমার তথ্য এখানে দেখানো হবে।');
 });
