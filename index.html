@@ -1,53 +1,30 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ছাত্র নিকেতন</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ছাত্র নিকেতন</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="auth-container" id="auth-container">
-            <h1>ছাত্র নিকেতন</h1>
-            <button id="signupBtn">সাইন আপ</button>
-            <button id="loginBtn">লগইন</button>
-        </div>
+  <header>
+    <h1>ছাত্র নিকেতন</h1>
+    <nav>
+      <a href="index.html">হোম</a>
+      <a href="login.html">লগইন</a>
+      <a href="signup.html">সাইন আপ</a>
+    </nav>
+  </header>
+  
+  <main>
+    <section>
+      <h2>মেস ম্যানেজমেন্ট ওয়েবসাইট</h2>
+      <p>আপনার মেসের সকল তথ্য এক জায়গায় পরিচালনা করুন। সদস্যগণ লগইন বা সাইন আপ করতে পারবেন, এবং এডমিন সকল তথ্য আপডেট করবেন।</p>
+    </section>
+  </main>
 
-        <div class="signup-container hidden" id="signup-container">
-            <h2>সাইন আপ</h2>
-            <form id="signupForm">
-                <label for="newUsername">ইউজারনেম:</label>
-                <input type="text" id="newUsername" name="newUsername" required>
-                <label for="newPassword">পাসওয়ার্ড:</label>
-                <input type="password" id="newPassword" name="newPassword" required>
-                <label for="newName">নাম:</label>
-                <input type="text" id="newName" name="newName" required>
-                <button type="submit">সাইন আপ</button>
-            </form>
-        </div>
-
-        <div class="login-container hidden" id="login-container">
-            <h2>লগইন</h2>
-            <form id="loginForm">
-                <label for="username">ইউজারনেম:</label>
-                <input type="text" id="username" name="username" required>
-                <label for="password">পাসওয়ার্ড:</label>
-                <input type="password" id="password" name="password" required>
-                <button type="submit">লগইন</button>
-            </form>
-            <div id="error-message" class="hidden">ভুল ইউজারনেম বা পাসওয়ার্ড</div>
-        </div>
-
-        <div class="dashboard hidden" id="dashboard">
-            <h1>স্বাগতম, <span id="memberName"></span>!</h1>
-            <div class="buttons">
-                <button id="viewInfoBtn">তোমার তথ্য দেখো</button>
-                <button id="logoutBtn">লগ আউট</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+  <footer>
+    <p>© ২০২৫ ছাত্র নিকেতন</p>
+  </footer>
 </body>
-  </html>
+</html>
