@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Chatro Niketon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #message {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="login-container">
+        <h1>Login to Chatro Niketon</h1>
+        <form id="login-form">
+            <input type="text" id="user-id" placeholder="Enter User ID" required>
+            <input type="password" id="user-password" placeholder="Enter Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p id="message">Invalid ID or Password. Try again.</p>
+    </div>
+
+    <div class="container" id="dashboard-container" style="display: none;">
+        <h1>Welcome to Chatro Niketon Dashboard</h1>
+        <p>You have successfully logged in.</p>
+        <button id="logout-button">Logout</button>
+    </div>
+
+    <script>
+        // Hardcoded credentials
+        const VALID_USER_ID = "Habibur12";
+        const VALID_PASSWORD = "Habibur12";
+
+        // Get references to DOM elements
+        const loginContainer = document.getElementById('login-container');
+        const dashboardContainer = document.getElementById('dashboard-container');
+        const loginForm = document.getElementById('login-form');
+        const message = document.getElementById('message');
+        const logoutButton = document.getElementById('logout-button');
+
+        // Check if user is already logged in
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            showDashboard();
+        }
+
+        // Login form submission
+        loginForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const userId = document.getElementById('user-id').value;
+            const password = document.getElementById('user-password').value;
+
+            if (userId === VALID_USER_ID && password === VALID_PASSWORD) {
+                localStorage.setItem('isLoggedIn', 'true'); // Save login status
+                showDashboard();
+            } else {
+                message.style.display = 'block';
+                message.textContent = "Invalid ID or Password. Try again.";
+            }
+        });
+
+        // Logout button click
+        logoutButton.addEventListener('click', function () {
+            localStorage.removeItem('isLoggedIn'); // Clear login status
+            showLogin();
+        });
+
+        // Function to show the dashboard
+        function showDashboard() {
+            loginContainer.style.display = 'none';
+            dashboardContainer.style.display = 'block';
+        }
+
+        // Function to show the login form
+        function showLogin() {
+            loginContainer.style.display = 'block';
+            dashboardContainer.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
