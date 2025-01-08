@@ -1,78 +1,202 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
-    <title>ছাত্র নিকেতন</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | ছাত্র নিকেতন</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-messaging.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333333;
+    }
+
+    /* Header Styles */
+    header {
+      background-color: #34495e;
+      color: #ecf0f1;
+      text-align: center;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      margin: 5px 0;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    header h4 {
+      margin: 5px 0;
+      font-size: 18px;
+      font-weight: normal;
+    }
+
+    #date-container {
+      font-size: 14px;
+      margin-bottom: 5px;
+      color: #dcdde1;
+    }
+
+    #last-month-rate {
+      margin: 10px 0;
+      font-size: 16px;
+      color: #ecf0f1;
+      font-weight: bold;
+      animation: slideLeft 10s linear infinite;
+    }
+
+    @keyframes slideLeft {
+      0% {
+        transform: translateX(100%);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+
+    /* Section Styles */
+    section {
+      margin: 20px auto;
+      padding: 20px;
+      max-width: 800px;
+      background: #ffffff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    section h2 {
+      margin-bottom: 15px;
+      font-size: 22px;
+      color: #2c3e50;
+      border-bottom: 2px solid #34495e;
+      padding-bottom: 5px;
+    }
+
+    section p {
+      font-size: 16px;
+      color: #555555;
+    }
+
+    button {
+      background-color: #2980b9;
+      color: #ffffff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    button:hover {
+      background-color: #1f618d;
+    }
+
+    button i {
+      margin-right: 8px;
+      font-size: 18px;
+    }
+
+    footer {
+      background-color: #2c3e50;
+      color: #ecf0f1;
+      text-align: center;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    footer div {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 10px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+    footer p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-    <h1>ছাত্র নিকেতন</h1>
-    
-    <div class="market-info">
-        <h2>বাজারের তথ্য</h2>
-        <div id="market-list">
-            <!-- এখানে বাজারের তথ্য যোগ হবে -->
-        </div>
+  <!-- Header Section -->
+  <header>
+    <div id="date-container">
+      <span id="current-date"></span> বিসমিল্লাহির রাহমানির রাহিম <span id="current-day"></span>
     </div>
-
-    <div class="meal-poll">
-        <h2>খাবারের মিল</h2>
-        <form id="meal-form">
-            <label for="member">সদস্য নির্বাচন করুন:</label>
-            <select id="member" required>
-                <option value="হাবিব">হাবিব</option>
-                <option value="শামসুল">শামসুল</option>
-                <option value="রাজু">রাজু</option>
-                <option value="সায়েম">সায়েম</option>
-                <option value="শিপন">শিপন</option>
-            </select>
-            <br>
-            <label>সকাল:</label>
-            <input type="checkbox" class="meal-checkbox" data-meal="half">
-            <label>বিকাল:</label>
-            <input type="checkbox" class="meal-checkbox" data-meal="full">
-            <label>রাত:</label>
-            <input type="checkbox" class="meal-checkbox" data-meal="full">
-            <br>
-            <button type="submit">জমা দিন</button>
-        </form>
+    <div id="last-month-rate">
+      <i class="fas fa-calendar-alt"></i> গত মাসের মিল রেট: <span id="meal-rate">39.2</span> টাকা
     </div>
+    <h1><i class="fas fa-user-graduate"></i> ছাত্র নিকেতন</h1>
+    <h4><i class="fas fa-user-tie"></i> জানুয়ারি মাসের ম্যাচ ম্যানেজার মোঃ সায়েম</h4>
+  </header>
 
-    <button id="members-button">সদস্য</button>
+  <!-- Notice Section -->
+  <section id="notice">
+    <h2><i class="fas fa-exclamation-circle"></i> Notice</h2>
+    <div id="notice-content">
+      <p><i class="fas fa-info-circle"></i> আগামী ১০ তারিখের ভিতরে শিপন ভাই, সায়েম ভাই, রাজু ভাই, তানভীর সহ সবাইকে বকেয়া পরিষদের জন্য অনুরোধ করা হলো। অনুরোধক্রমে: ম্যাচ কর্তৃপক্ষ।</p>
+    </div>
+  </section>
 
-    <script>
-        document.getElementById('members-button').addEventListener('click', function() {
-            window.location.href = 'member.html';
-        });
+  <!-- Market List Section -->
+  <section id="market-list">
+    <h2><i class="fas fa-cart-plus"></i> বাজার তালিকা</h2>
+    <a href="market.html"><button><i class="fas fa-shopping-cart"></i> বাজার তালিকা দেখুন</button></a>
+  </section>
 
-        document.getElementById('meal-form').addEventListener('submit', function(e) {
-            e.preventDefault(); // ফর্ম জমা দেওয়া বন্ধ করুন
+  <!-- Meal Tracking Section -->
+  <section id="meal-tracking">
+    <h2><i class="fas fa-calendar-check"></i> মিল ট্র্যাকিং</h2>
+    <a href="meal_tracking.html"><button><i class="fas fa-calendar-day"></i> মিল ট্র্যাকিং দেখুন</button></a>
+  </section>
 
-            const member = document.getElementById('member').value;
-            const meals = document.querySelectorAll('.meal-checkbox');
-            let mealCount = 0;
+  <!-- Footer Section -->
+  <footer>
+    <div>
+      <p><i class="fas fa-cogs"></i> Developed by: <strong>Habibur Rahman Mahi</strong></p>
+    </div>
+  </footer>
 
-            meals.forEach(meal => {
-                if (meal.checked) {
-                    if (meal.dataset.meal === "half") {
-                        mealCount += 0.5; // হাফ মিল
-                    } else {
-                        mealCount += 1; // পূর্ণ মিল
-                    }
-                }
-            });
+  <!-- Firebase Config -->
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAE3GEe85kVgGjFs-AabYc6iaOIYyEaxqg",
+      authDomain: "mission-infinity.firebaseapp.com",
+      projectId: "mission-infinity",
+      storageBucket: "mission-infinity.firebasestorage.app",
+      messagingSenderId: "226312029801",
+      appId: "1:226312029801:web:bf0a7092df65c505c104f8",
+      measurementId: "G-V3G1C32M1G"
+    };
 
-            // বাজারের তথ্য যোগ করুন
-            const marketList = document.getElementById('market-list');
-            const newEntry = document.createElement('div');
-            newEntry.textContent = `${member} এর মিল: ${mealCount} (সকাল: ${meals[0].checked ? "হ্যাঁ" : "না"}, বিকাল: ${meals[1].checked ? "হ্যাঁ" : "না"}, রাত: ${meals[2].checked ? "হ্যাঁ" : "না"})`;
-            marketList.appendChild(newEntry);
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
 
-            // ফর্ম পুনরায় সেট করুন
-            document.getElementById('meal-form').reset();
-        });
-    </script>
+    const messaging = firebase.messaging();
+
+    // Request Notification Permission
+    function requestPermission() {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          console.log("Notification permission granted.");
+        } else {
+          console.log("Unable to get permission to notify.");
+        }
+      });
+    }
+
+    requestPermission();
+  </script>
 </body>
-  </html>
+</html>
