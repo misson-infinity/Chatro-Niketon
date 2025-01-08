@@ -21,44 +21,38 @@
     header {
       background-color: #34495e;
       color: #ecf0f1;
-      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 20px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     header h1 {
-      margin: 5px 0;
+      margin: 0;
       font-size: 28px;
       font-weight: bold;
     }
 
     header h4 {
-      margin: 5px 0;
+      margin: 0;
       font-size: 18px;
       font-weight: normal;
     }
 
-    #date-container {
-      font-size: 14px;
-      margin-bottom: 5px;
-      color: #dcdde1;
-    }
-
-    #last-month-rate {
-      margin: 10px 0;
+    #logout-button {
+      background-color: #e74c3c;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
       font-size: 16px;
-      color: #ecf0f1;
-      font-weight: bold;
-      animation: slideLeft 10s linear infinite;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
     }
 
-    @keyframes slideLeft {
-      0% {
-        transform: translateX(100%);
-      }
-      100% {
-        transform: translateX(-100%);
-      }
+    #logout-button:hover {
+      background-color: #c0392b;
     }
 
     /* Section Styles */
@@ -130,14 +124,11 @@
 <body>
   <!-- Header Section -->
   <header>
-    <div id="date-container">
-      <span id="current-date"></span> বিসমিল্লাহির রাহমানির রাহিম <span id="current-day"></span>
+    <div>
+      <h1><i class="fas fa-user-graduate"></i> ছাত্র নিকেতন</h1>
+      <h4><i class="fas fa-user-tie"></i> জানুয়ারি মাসের ম্যাচ ম্যানেজার মোঃ সায়েম</h4>
     </div>
-    <div id="last-month-rate">
-      <i class="fas fa-calendar-alt"></i> গত মাসের মিল রেট: <span id="meal-rate">39.2</span> টাকা
-    </div>
-    <h1><i class="fas fa-user-graduate"></i> ছাত্র নিকেতন</h1>
-    <h4><i class="fas fa-user-tie"></i> জানুয়ারি মাসের ম্যাচ ম্যানেজার মোঃ সায়েম</h4>
+    <button id="logout-button"><i class="fas fa-sign-out-alt"></i> Logout</button>
   </header>
 
   <!-- Notice Section -->
@@ -167,9 +158,15 @@
     </div>
   </footer>
 
-  <!-- Firebase Config -->
   <script>
-    // Firebase Configuration
+    // Logout Button Functionality
+    const logoutButton = document.getElementById("logout-button");
+    logoutButton.addEventListener("click", () => {
+      localStorage.removeItem("isLoggedIn"); // Remove the login status
+      window.location.href = "index.html"; // Redirect to the login page
+    });
+
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyAE3GEe85kVgGjFs-AabYc6iaOIYyEaxqg",
       authDomain: "mission-infinity.firebaseapp.com",
@@ -180,12 +177,10 @@
       measurementId: "G-V3G1C32M1G"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
 
     const messaging = firebase.messaging();
 
-    // Request Notification Permission
     function requestPermission() {
       Notification.requestPermission().then(permission => {
         if (permission === "granted") {
