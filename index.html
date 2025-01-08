@@ -58,16 +58,11 @@
         <p id="message">Invalid ID or Password. Try again.</p>
     </div>
 
-    <div class="container" id="dashboard-container" style="display: none;">
-        <h1>Welcome to Chatro Niketon Dashboard</h1>
-        <p>You have successfully logged in.</p>
-        <button id="logout-button">Logout</button>
+    <div class="container" id="dashboard-button-container" style="display: none;">
+        <h1>Login Successful!</h1>
+        <button id="dashboard-button">Go to Dashboard</button>
     </div>
-!-- dashboard -->
-  <section id="dashboard">
-    <h2> Dashboard</h2>
-    <a href="dashboard.html"><button><i class="fas fa-dashbord"></i> Dashboard</button></a> <!-- Icon added to the button -->
-  </section>
+
     <script>
         // Hardcoded credentials
         const VALID_USER_ID = "Habibur12";
@@ -75,14 +70,14 @@
 
         // Get references to DOM elements
         const loginContainer = document.getElementById('login-container');
-        const dashboardContainer = document.getElementById('dashboard-container');
+        const dashboardButtonContainer = document.getElementById('dashboard-button-container');
         const loginForm = document.getElementById('login-form');
         const message = document.getElementById('message');
-        const logoutButton = document.getElementById('logout-button');
+        const dashboardButton = document.getElementById('dashboard-button');
 
         // Check if user is already logged in
         if (localStorage.getItem('isLoggedIn') === 'true') {
-            showDashboard();
+            showDashboardButton();
         }
 
         // Login form submission
@@ -94,29 +89,22 @@
 
             if (userId === VALID_USER_ID && password === VALID_PASSWORD) {
                 localStorage.setItem('isLoggedIn', 'true'); // Save login status
-                showDashboard();
+                showDashboardButton();
             } else {
                 message.style.display = 'block';
-                message.textContent = "পাসওয়ার্ড হয় নাই। হাবিবুর রহমান মাহির সাথে যোগাযোগ করুন।";
+                message.textContent = "Invalid ID or Password. Try again.";
             }
         });
 
-        // Logout button click
-        logoutButton.addEventListener('click', function () {
-            localStorage.removeItem('isLoggedIn'); // Clear login status
-            showLogin();
+        // Dashboard button click
+        dashboardButton.addEventListener('click', function () {
+            window.location.href = "dashboard.html"; // Redirect to dashboard.html
         });
 
-        // Function to show the dashboard
-        function showDashboard() {
+        // Function to show the dashboard button
+        function showDashboardButton() {
             loginContainer.style.display = 'none';
-            dashboardContainer.style.display = 'block';
-        }
-
-        // Function to show the login form
-        function showLogin() {
-            loginContainer.style.display = 'block';
-            dashboardContainer.style.display = 'none';
+            dashboardButtonContainer.style.display = 'block';
         }
     </script>
 </body>
