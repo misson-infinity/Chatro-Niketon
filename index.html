@@ -208,11 +208,11 @@
     function generatePDF() {
   const element = document.getElementById("table-container");
   const opt = {
-    margin:       [0.5, 0.5, 0.5, 0.5], // উপরে, নীচে, বাম, ডান মার্জিন
+    margin:       [0.01, 0.01, 0.01, 0.01], // উপরে, নীচে, বাম, ডান মার্জিন
     filename:     'meal-report.pdf',
-    image:        { type: 'png', quality: 1 }, // PNG ইমেজ এবং পূর্ণ গুণমান
-    html2canvas:  { scale: 2 },
-    jsPDF:        { unit: 'in', format: [20, 11.25], orientation: 'landscape' } // কাস্টম সাইজ
+    image:        { type: 'png', quality: 0.5 }, // PNG ইমেজ এবং পূর্ণ গুণমান
+    html2canvas:  { scale: 1 },
+    jsPDF:        { unit: 'in', format: [2, 1.125], orientation: 'landscape' } // কাস্টম সাইজ
   };
 
   // Create PDF
@@ -253,7 +253,7 @@
 
   <!-- Footer -->
   <footer>
-    <p>© 2025 মেস ম্যানেজমেন্ট | সর্বস্বত্ব সংরক্ষিত</p>
+    <p>© 205 মেস ম্যানেজমেন্ট | সর্বস্বত্ব সংরক্ষিত</p>
   </footer>
 </body>
 </html>
