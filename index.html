@@ -206,18 +206,18 @@
     }
 
     function generatePDF() {
-      const element = document.getElementById("table-container");
-      const opt = {
-        margin:       1,
-        filename:     'meal-report.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-      };
+  const element = document.getElementById("table-container");
+  const opt = {
+    margin:       [0.5, 0.5, 0.5, 0.5], // উপরে, নীচে, বাম, ডান মার্জিন
+    filename:     'meal-report.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' } // A4 সাইজ
+  };
 
-      // Create PDF
-      html2pdf().from(element).set(opt).save();
-    }
+  // Create PDF
+  html2pdf().from(element).set(opt).save();
+}
 
     function generateChart() {
       const selectedMonth = document.getElementById("month").value;
