@@ -210,9 +210,9 @@
   const opt = {
     margin:       [0.5, 0.5, 0.5, 0.5], // উপরে, নীচে, বাম, ডান মার্জিন
     filename:     'meal-report.pdf',
-    image:        { type: 'jpeg', quality: 2.98 },
-    html2canvas:  { scale: 4 },
-    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' } // A4 সাইজ
+    image:        { type: 'png', quality: 1 }, // PNG ইমেজ এবং পূর্ণ গুণমান
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: 'in', format: [20, 11.25], orientation: 'landscape' } // কাস্টম সাইজ
   };
 
   // Create PDF
@@ -253,7 +253,7 @@
 
   <!-- Footer -->
   <footer>
-    <p>© 205 মেস ম্যানেজমেন্ট | সর্বস্বত্ব সংরক্ষিত</p>
+    <p>© 2025 মেস ম্যানেজমেন্ট | সর্বস্বত্ব সংরক্ষিত</p>
   </footer>
 </body>
 </html>
