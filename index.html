@@ -93,7 +93,7 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <h1>মাসিক মিল হিসাব</h1>
@@ -149,7 +149,6 @@
 
       const year = new Date().getFullYear();
       const daysInMonth = new Date(year, parseInt(selectedMonth) + 1, 0).getDate();
-
       const savedData = loadFromStorage(selectedMonth);
 
       let tableHTML = `<table>
@@ -162,16 +161,10 @@
       for (let day = 1; day <= daysInMonth; day++) {
         tableHTML += `<tr>
           <td>${day}</td>
-          ${members
-            .map(
-              member => `
-              <td>
-                <input type="number" id="${member}-day-${day}" value="${
-                savedData[member]?.[day - 1] || 0
-              }" onchange="saveMeal('${member}', ${day})" min="0" style="width: 60px; text-align: center;">
-              </td>`
-            )
-            .join("")}
+          ${members.map(member => `
+            <td>
+              <input type="number" id="${member}-day-${day}" value="${savedData[member]?.[day - 1] || 0}" onchange="saveMeal('${member}', ${day})" min="0" style="width: 60px; text-align: center;">
+            </td>`).join("")}
           <td id="day-total-${day}">0</td>
         </tr>`;
       }
@@ -213,31 +206,17 @@
     }
 
     function generatePDF() {
-      const doc = new jsPDF();
-      const selectedMonth = document.getElementById("month").value;
-      const savedData = loadFromStorage(selectedMonth);
+      const element = document.getElementById("table-container");
+      const opt = {
+        margin:       1,
+        filename:     'meal-report.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
 
-      doc.text("মেস ম্যানেজমেন্ট রিপোর্ট", 20, 20);
-
-      let pdfContent = "তারিখ\t" + members.join("\t") + "\tমোট\n";
-
-      for (let day = 1; day <= 31; day++) {
-        let row = `${day}`;
-        let dailyTotal = 0;
-
-        members.forEach(member => {
-          const value = savedData[member]?.[day - 1] || 0;
-          row += `\t${value}`;
-          dailyTotal += value;
-        });
-
-        row += `\t${dailyTotal}`;
-        pdfContent += row + "\n";
-      }
-
-      const lines = doc.splitTextToSize(pdfContent, 180); // Adjust width to fit content
-      doc.text(lines, 20, 30);
-      doc.save("meal-report.pdf");
+      // Create PDF
+      html2pdf().from(element).set(opt).save();
     }
 
     function generateChart() {
@@ -272,4 +251,9 @@
     }
   </script>
 
-  <
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 মেস ম্যানেজমেন্ট | সর্বস্বত্ব সংরক্ষিত</p>
+  </footer>
+</body>
+</html>
