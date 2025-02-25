@@ -1,259 +1,1364 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>মেস ম্যানেজমেন্ট</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultra Advanced Mess Management System</title>
+  <!-- Include Chart.js and jsPDF -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
+    /* CSS Variables for Themes */
+    :root {
+      --bg-color: #f5f5f5;
+      --text-color: #333;
+      --primary-color: #007BFF;
+      --header-bg: #007BFF;
+      --header-text: #fff;
+    }
+    .dark-theme {
+      --bg-color: #333;
+      --text-color: #f5f5f5;
+      --primary-color: #17a2b8;
+      --header-bg: #17a2b8;
+      --header-text: #fff;
+    }
+    /* Global Styles */
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f4f4f9;
-      color: #333;
-      text-align: center;
+      background-color: var(--bg-color);
+      color: var(--text-color);
     }
-
-    h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-      color: #0056b3;
-    }
-
-    select {
-      padding: 8px 12px;
-      font-size: 16px;
-      margin: 20px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    table {
-      margin: 20px auto;
-      border-collapse: collapse;
-      width: 90%;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    th, td {
-      border: 1px solid #ddd;
-      text-align: center;
+    .container {
+      max-width: 1400px;
+      margin: auto;
       padding: 10px;
     }
-
-    th {
-      background-color: #0056b3;
-      color: white;
-      font-weight: bold;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
-    tr:hover {
-      background-color: #f1f1f1;
-    }
-
-    .total-row {
-      font-weight: bold;
-      background-color: #0056b3;
-      color: white;
-    }
-
-    button {
-      background-color: #0056b3;
-      color: white;
+    header {
+      background: var(--header-bg);
+      color: var(--header-text);
       padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { margin: 0; }
+    header .header-right { display: flex; align-items: center; gap: 10px; }
+    a { color: var(--primary-color); text-decoration: none; }
+    button {
+      background: var(--primary-color);
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
+      color: #fff;
+      padding: 5px 10px;
       cursor: pointer;
-      font-size: 16px;
-      margin-top: 20px;
     }
-
-    button:hover {
-      background-color: #003f7f;
+    button:hover { opacity: 0.9; }
+    .nav-buttons { margin: 10px 0; display: flex; flex-wrap: wrap; gap: 5px; }
+    .nav-buttons button { padding: 8px 12px; }
+    .tab-section { display: none; }
+    .active-tab { display: block; }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    /* Notification Bar */
+    #notification { 
+      position: fixed; top: 10px; right: 10px; background: var(--primary-color); 
+      color: #fff; padding: 10px; border-radius: 4px; display: none; 
+      animation: fadein 0.5s;
     }
-
-    canvas {
-      margin-top: 20px;
-      max-width: 100%;
+    @keyframes fadein { from {opacity: 0;} to {opacity: 1;} }
+    /* Modal Styles */
+    .modal {
+      position: fixed; top: 0; left: 0; width:100%; height:100%;
+      background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center;
+      z-index: 2000;
     }
-
-    footer {
-      margin-top: 40px;
-      padding: 20px 0;
-      background-color: #0056b3;
-      color: white;
-      text-align: center;
-      font-size: 14px;
+    .modal-content {
+      background: #fff; padding: 20px; border-radius: 4px; max-width: 500px; width: 90%;
+    }
+    /* Summary Widgets */
+    .widgets { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
+    .widget { flex: 1 1 150px; background: var(--primary-color); color: #fff; padding: 10px; border-radius: 4px; text-align: center; }
+    /* Chat & Extra Tabs */
+    #chat-messages { max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; }
+    /* Calendar View */
+    #calendar-view { display: flex; flex-wrap: wrap; gap: 5px; }
+    .calendar-day { width: 80px; height: 80px; border: 1px solid var(--primary-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+    /* Loading Spinner */
+    .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    /* Responsive */
+    @media(max-width: 768px) {
+      .widgets { flex-direction: column; }
+      header { flex-direction: column; align-items: flex-start; }
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-  <h1>মাসিক মিল হিসাব</h1>
-
-  <label for="month">মাস নির্বাচন করুন:</label>
-  <select id="month" onchange="generateTable()">
-    <option value="">-- মাস নির্বাচন করুন --</option>
-    <option value="0">জানুয়ারি</option>
-    <option value="1">ফেব্রুয়ারি</option>
-    <option value="2">মার্চ</option>
-    <option value="3">এপ্রিল</option>
-    <option value="4">মে</option>
-    <option value="5">জুন</option>
-    <option value="6">জুলাই</option>
-    <option value="7">আগস্ট</option>
-    <option value="8">সেপ্টেম্বর</option>
-    <option value="9">অক্টোবর</option>
-    <option value="10">নভেম্বর</option>
-    <option value="11">ডিসেম্বর</option>
-  </select>
-
-  <div id="table-container"></div>
-
-  <button onclick="calculateTotal()">মোট মিল দেখুন</button>
-  <button onclick="generatePDF()">PDF রিপোর্ট তৈরি করুন</button>
-  <button onclick="generateChart()">চার্ট তৈরি করুন</button>
-
-  <div id="total-summary" style="margin-top: 20px; font-size: 18px; font-weight: bold;"></div>
-
-  <canvas id="mealChart" style="margin-top: 20px;"></canvas>
-
+  <!-- Notification -->
+  <div id="notification"></div>
+  
+  <div class="container">
+    <!-- Header with Real-Time Clock, Theme Toggle, Language & Primary Color Picker -->
+    <header>
+      <h1 id="site-title">Ultra Advanced Mess Management System</h1>
+      <div class="header-right">
+        <span id="real-time-clock"></span>
+        <label for="theme-toggle">Dark Mode:</label>
+        <input type="checkbox" id="theme-toggle">
+        <label for="language-toggle">Language:</label>
+        <select id="language-toggle">
+          <option value="en">English</option>
+          <option value="bn">বাংলা</option>
+        </select>
+        <label for="primary-color-picker">Theme Color:</label>
+        <input type="color" id="primary-color-picker" value="#007BFF">
+        <div id="user-info" style="display:none;">
+          <span id="welcome-user"></span> | <a id="profile-link">Profile</a> | <a id="logout-link">Logout</a>
+        </div>
+      </div>
+    </header>
+    
+    <!-- Authentication Section -->
+    <section id="auth-section">
+      <!-- Login Form -->
+      <div id="login-form-container">
+        <h2 id="login-title">Login</h2>
+        <form id="login-form">
+          <label id="login-username-label">Username:</label>
+          <input type="text" required>
+          <label id="login-password-label">Password:</label>
+          <input type="password" required>
+          <button type="submit" id="login-btn">Login</button>
+          <br>
+          <a id="show-register">Register</a> | <a id="reset-password-link">Forgot Password?</a>
+          <br>
+          <!-- Social Login Simulation -->
+          <button id="google-login-btn" type="button">Login with Google</button>
+        </form>
+      </div>
+      <!-- Registration Form -->
+      <div id="register-form-container" style="display:none;">
+        <h2 id="register-title">Register</h2>
+        <form id="register-form">
+          <label id="reg-username-label">Username:</label>
+          <input type="text" required>
+          <label id="reg-password-label">Password:</label>
+          <input type="password" required>
+          <label id="reg-role-label">Role:</label>
+          <select required>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button type="submit" id="register-btn">Register</button>
+          <br>
+          <a id="show-login">Back to Login</a>
+        </form>
+      </div>
+      <!-- Reset Password Form -->
+      <div id="reset-password-container" style="display:none;">
+        <h2 id="reset-password-title">Reset Password</h2>
+        <form id="reset-password-form">
+          <label id="reset-username-label">Username:</label>
+          <input type="text" id="reset-username" required>
+          <label id="new-password-label">New Password:</label>
+          <input type="password" id="new-password" required>
+          <button type="submit" id="reset-password-btn">Reset Password</button>
+          <br>
+          <a id="back-to-login-from-reset">Back to Login</a>
+        </form>
+      </div>
+    </section>
+    
+    <!-- Dashboard Section -->
+    <section id="dashboard" style="display:none;">
+      <!-- Mess Setup Section -->
+      <div id="mess-setup-section">
+        <h2 id="mess-setup-title">Mess Setup</h2>
+        <form id="mess-setup-form">
+          <label id="mess-name-label">Mess Name:</label>
+          <input type="text" id="mess-name" required>
+          <label id="member-names-label">Member Names (one per line):</label>
+          <textarea id="member-names" rows="5" required></textarea>
+          <button type="submit" id="setup-mess-btn">Setup Mess</button>
+        </form>
+      </div>
+      
+      <!-- Main Dashboard -->
+      <div id="main-dashboard" style="display:none;">
+        <!-- Navigation Tabs (including additional 50+ features) -->
+        <div class="nav-buttons">
+          <button data-tab="meal-tracking-tab" class="tab-btn">Meal Tracking</button>
+          <button data-tab="market-expense-tab" class="tab-btn">Market Expense</button>
+          <button data-tab="monthly-report-tab" class="tab-btn">Monthly Report</button>
+          <button data-tab="chart-tab" class="tab-btn">Chart</button>
+          <button data-tab="data-management-tab" class="tab-btn">Data Management</button>
+          <button data-tab="profile-tab" class="tab-btn">Profile</button>
+          <button data-tab="activity-log-tab" class="tab-btn">Activity Log</button>
+          <button data-tab="calendar-tab" class="tab-btn">Calendar</button>
+          <button data-tab="settings-tab" class="tab-btn">Settings</button>
+          <!-- Additional Feature Tabs -->
+          <button data-tab="chat-tab" class="tab-btn">Chat</button>
+          <button data-tab="budget-tab" class="tab-btn">Budget</button>
+          <button data-tab="news-tab" class="tab-btn">News Feed</button>
+          <button data-tab="help-tab" class="tab-btn">Help/FAQ</button>
+          <button data-tab="contact-tab" class="tab-btn">Contact</button>
+          <button data-tab="feedback-tab" class="tab-btn">Feedback</button>
+          <button data-tab="performance-tab" class="tab-btn">Performance</button>
+          <button data-tab="map-tab" class="tab-btn">Nearby Stores</button>
+        </div>
+        
+        <!-- Summary Widgets -->
+        <div class="widgets" id="summary-widgets"></div>
+        
+        <!-- Tab Contents -->
+        <div id="tab-content">
+          <!-- Meal Tracking Tab -->
+          <div id="meal-tracking-tab" class="tab-section active-tab">
+            <h3 id="meal-input-title">Daily Meal Input</h3>
+            <form id="meal-form">
+              <label id="meal-date-label">Date:</label>
+              <input type="date" id="meal-date" required>
+              <div id="meal-inputs">
+                <!-- Dynamically generated meal inputs for each member -->
+              </div>
+              <label id="meal-remarks-label">Remarks:</label>
+              <input type="text" id="meal-remarks" placeholder="Optional remarks">
+              <button type="submit">Submit Meals</button>
+            </form>
+            <div>
+              <label>Filter by Date:</label>
+              <input type="date" id="meal-filter-date">
+              <label>Search:</label>
+              <input type="text" id="meal-search" placeholder="Search by member">
+            </div>
+            <h3 id="meal-log-title">Meal Entries Log</h3>
+            <table id="meal-log-table">
+              <thead>
+                <tr>
+                  <th data-sort="date" class="sortable">Date</th>
+                  <th data-sort="member" class="sortable">Member</th>
+                  <th>Morning</th>
+                  <th>Noon</th>
+                  <th>Dinner</th>
+                  <th>Total</th>
+                  <th>Remarks</th>
+                  <th>Comments</th>
+                  <th>Rating</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          
+          <!-- Market Expense Tab -->
+          <div id="market-expense-tab" class="tab-section">
+            <h3 id="expense-input-title">Market Expense Input</h3>
+            <form id="expense-form" enctype="multipart/form-data">
+              <label id="expense-date-label">Date:</label>
+              <input type="date" id="expense-date" required>
+              <label id="expense-member-label">Member:</label>
+              <select id="expense-member" required></select>
+              <label id="expense-amount-label">Amount:</label>
+              <input type="number" id="expense-amount" step="0.01" required>
+              <label id="expense-category-label">Category:</label>
+              <select id="expense-category" required>
+                <option value="Groceries">Groceries</option>
+                <option value="Vegetables">Vegetables</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Other">Other</option>
+              </select>
+              <label id="expense-remarks-label">Remarks:</label>
+              <input type="text" id="expense-remarks" placeholder="Optional remarks">
+              <label id="expense-receipt-label">Photo Receipt:</label>
+              <input type="file" id="expense-receipt">
+              <button type="submit">Submit Expense</button>
+            </form>
+            <div>
+              <label>Filter by Date:</label>
+              <input type="date" id="expense-filter-date">
+              <label>Search:</label>
+              <input type="text" id="expense-search" placeholder="Search by member">
+            </div>
+            <h3 id="expense-log-title">Expense Entries Log</h3>
+            <table id="expense-log-table">
+              <thead>
+                <tr>
+                  <th data-sort="date" class="sortable">Date</th>
+                  <th data-sort="member" class="sortable">Member</th>
+                  <th>Amount</th>
+                  <th>Category</th>
+                  <th>Remarks</th>
+                  <th>Tags</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          
+          <!-- Monthly Report Tab -->
+          <div id="monthly-report-tab" class="tab-section">
+            <h3 id="monthly-report-title">Monthly Report</h3>
+            <button id="export-pdf-btn">Export Report to PDF</button>
+            <button id="download-csv-btn">Download CSV</button>
+            <div>
+              <button id="daily-view-btn">Daily View</button>
+              <button id="weekly-view-btn">Weekly View</button>
+              <button id="monthly-view-btn">Monthly View</button>
+            </div>
+            <table id="monthly-report-table">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Total Meals</th>
+                  <th>Total Expense</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          
+          <!-- Chart Tab -->
+          <div id="chart-tab" class="tab-section">
+            <h3 id="chart-title">Meal Totals Chart</h3>
+            <canvas id="mealChart" width="400" height="200"></canvas>
+            <h3>Expense Over Time</h3>
+            <canvas id="expenseChart" width="400" height="200"></canvas>
+          </div>
+          
+          <!-- Data Management Tab -->
+          <div id="data-management-tab" class="tab-section">
+            <h3 id="data-management-title">Data Management</h3>
+            <button id="export-data-btn">Export Data (JSON)</button>
+            <button id="backup-data-btn">Backup Now</button>
+            <br><br>
+            <label id="import-data-label">Import Data (JSON):</label>
+            <input type="file" id="import-data-input">
+          </div>
+          
+          <!-- Profile Tab -->
+          <div id="profile-tab" class="tab-section">
+            <h3 id="profile-title">User Profile</h3>
+            <form id="profile-form">
+              <label id="profile-username-label">Username:</label>
+              <input type="text" id="profile-username" readonly>
+              <label id="profile-password-label">New Password:</label>
+              <input type="password" id="profile-password">
+              <label id="profile-avatar-label">Profile Picture:</label>
+              <input type="file" id="profile-avatar">
+              <img id="profile-avatar-preview" src="" alt="Avatar" style="width:100px; display:none;">
+              <button type="submit">Update Profile</button>
+            </form>
+          </div>
+          
+          <!-- Activity Log Tab -->
+          <div id="activity-log-tab" class="tab-section">
+            <h3 id="activity-log-title">Activity Log</h3>
+            <div id="activity-log-content" style="max-height:200px; overflow:auto; border:1px solid #ccc; padding:5px;"></div>
+          </div>
+          
+          <!-- Calendar Tab -->
+          <div id="calendar-tab" class="tab-section">
+            <h3 id="calendar-title">Meal Entries Calendar</h3>
+            <div id="calendar-view"></div>
+          </div>
+          
+          <!-- Settings Tab -->
+          <div id="settings-tab" class="tab-section">
+            <h3 id="settings-title">Settings</h3>
+            <button id="reset-monthly-btn">Reset Monthly Totals</button>
+            <h4 id="meal-rates-title">Customize Meal Rates</h4>
+            <form id="meal-rates-form">
+              <label id="morning-rate-label">Morning Rate:</label>
+              <input type="number" id="morning-rate" step="0.1" value="0.5" required>
+              <label id="noon-rate-label">Noon Rate:</label>
+              <input type="number" id="noon-rate" step="0.1" value="1" required>
+              <label id="dinner-rate-label">Dinner Rate:</label>
+              <input type="number" id="dinner-rate" step="0.1" value="1" required>
+              <button type="submit">Save Rates</button>
+            </form>
+            <h4>Auto Logout Settings</h4>
+            <label>Inactivity Timeout (minutes):</label>
+            <input type="number" id="auto-logout-time" value="5" min="1">
+            <button id="save-logout-settings-btn">Save Logout Settings</button>
+            <h4>Dark Mode Schedule</h4>
+            <label>Enable Dark Mode After (hour):</label>
+            <input type="number" id="dark-mode-hour" value="18" min="0" max="23">
+            <button id="save-dark-mode-schedule-btn">Save Dark Mode Schedule</button>
+            <h4>Currency Conversion</h4>
+            <label>Select Currency:</label>
+            <select id="currency-select">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="BDT">BDT</option>
+            </select>
+            <button id="convert-currency-btn">Convert Rates</button>
+            <h4>Custom Table Columns</h4>
+            <label><input type="checkbox" id="toggle-comments-col" checked> Show Comments</label>
+            <label><input type="checkbox" id="toggle-rating-col" checked> Show Rating</label>
+          </div>
+          
+          <!-- Chat Tab (Additional Feature) -->
+          <div id="chat-tab" class="tab-section">
+            <h3>Mess Chat Room</h3>
+            <div id="chat-messages"></div>
+            <input type="text" id="chat-input" placeholder="Type your message...">
+            <button id="send-chat-btn">Send</button>
+          </div>
+          
+          <!-- Budget Tab (Additional Feature) -->
+          <div id="budget-tab" class="tab-section">
+            <h3>Personal Budgeting</h3>
+            <form id="budget-form">
+              <label>Monthly Budget:</label>
+              <input type="number" id="monthly-budget" required>
+              <button type="submit">Set Budget</button>
+            </form>
+            <div id="budget-summary"></div>
+          </div>
+          
+          <!-- News Feed Tab (Additional Feature) -->
+          <div id="news-tab" class="tab-section">
+            <h3>Mess News Feed</h3>
+            <div id="news-feed">
+              <p>No news available.</p>
+            </div>
+          </div>
+          
+          <!-- Help/FAQ Tab (Additional Feature) -->
+          <div id="help-tab" class="tab-section">
+            <h3>Help & FAQ</h3>
+            <p>Frequently Asked Questions will be displayed here.</p>
+          </div>
+          
+          <!-- Contact Tab (Additional Feature) -->
+          <div id="contact-tab" class="tab-section">
+            <h3>Contact Us</h3>
+            <form id="contact-form">
+              <label>Your Email:</label>
+              <input type="email" id="contact-email" required>
+              <label>Message:</label>
+              <textarea id="contact-message" rows="4" required></textarea>
+              <button type="submit">Send</button>
+            </form>
+          </div>
+          
+                 <!-- Feedback Tab (Additional Feature) -->
+          <div id="feedback-tab" class="tab-section">
+            <h3>Feedback</h3>
+            <form id="feedback-form">
+              <label>Your Feedback:</label>
+              <textarea id="feedback-message" rows="4" required></textarea>
+              <button type="submit">Submit Feedback</button>
+            </form>
+          </div>
+          
+          <!-- Performance Tab (Additional Feature) -->
+          <div id="performance-tab" class="tab-section">
+            <h3>Performance Metrics</h3>
+            <div id="performance-metrics">
+              <p>Loading performance metrics...</p>
+            </div>
+          </div>
+          
+          <!-- Map Tab (Additional Feature) -->
+          <div id="map-tab" class="tab-section">
+            <h3>Nearby Stores</h3>
+            <!-- Google Maps Embed -->
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.902612982103!2d90.39138831536309!3d23.75090329458807!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755bf4e5fdf3d73%3A0x2d8d4d3d2f6b7e8d!2sDhaka!5e0!3m2!1sen!2sbd!4v1610000000000!5m2!1sen!2sbd"
+              width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <!-- Confirmation Modal -->
+  <div id="confirm-modal" class="modal">
+    <div class="modal-content">
+      <p id="confirm-message">Are you sure?</p>
+      <button id="confirm-yes-btn">Yes</button>
+      <button id="confirm-no-btn">No</button>
+    </div>
+  </div>
+  
+  <!-- Loading Spinner -->
+  <div id="loading-spinner" class="spinner" style="display:none; position:fixed; top:50%; left:50%;"></div>
+  
   <script>
-    const members = ["Habib", "Raju", "Samsul", "Saim", "Shipon", "Anwar"];
-    const tableContainer = document.getElementById("table-container");
-    const totalSummary = document.getElementById("total-summary");
-
-    function loadFromStorage(month) {
-      const savedData = JSON.parse(localStorage.getItem(`meals-${month}`)) || {};
-      return savedData;
+    /***** Global Variables and Data Structures *****/
+    let currentUser = null;
+    let lastDeleted = null;
+    let activityLog = []; // For audit trails
+    // messData structure holds mess details, members, meal and expense entries.
+    let messData = null;
+    let mealEntryIdCounter = 0;
+    let expenseEntryIdCounter = 0;
+    // Customizable Meal Rates
+    let mealRates = { morning: 0.5, noon: 1, dinner: 1 };
+    // Auto logout timeout (in minutes)
+    let autoLogoutTimeout = 5;
+    let logoutTimer;
+    // Dark Mode Schedule Hour (e.g., 18 means after 6 PM dark mode auto-on)
+    let darkModeHour = 18;
+    // Current Language (default English)
+    let currentLang = "en";
+    
+    /***** Utility Functions *****/
+    function showNotification(message) {
+      const notif = document.getElementById("notification");
+      notif.textContent = message;
+      notif.style.display = "block";
+      setTimeout(() => { notif.style.display = "none"; }, 3000);
     }
-
-    function saveToStorage(month, data) {
-      localStorage.setItem(`meals-${month}`, JSON.stringify(data));
+    function logActivity(message) {
+      const timestamp = new Date().toLocaleString();
+      activityLog.unshift(`[${timestamp}] ${message}`);
+      updateActivityLog();
     }
-
-    function generateTable() {
-      const selectedMonth = document.getElementById("month").value;
-      if (!selectedMonth) {
-        tableContainer.innerHTML = "";
-        totalSummary.innerHTML = "";
-        return;
+    function updateActivityLog() {
+      const container = document.getElementById("activity-log-content");
+      container.innerHTML = activityLog.map(msg => `<div>${msg}</div>`).join("");
+    }
+    function saveMessData() {
+      if (currentUser) {
+        localStorage.setItem("messData_" + currentUser.username, JSON.stringify(messData));
       }
-
-      const year = new Date().getFullYear();
-      const daysInMonth = new Date(year, parseInt(selectedMonth) + 1, 0).getDate();
-      const savedData = loadFromStorage(selectedMonth);
-
-      let tableHTML = `<table>
-        <tr>
-          <th>তারিখ</th>
-          ${members.map(member => `<th>${member}</th>`).join("")}
-          <th>মোট</th>
-        </tr>`;
-
-      for (let day = 1; day <= daysInMonth; day++) {
-        tableHTML += `<tr>
-          <td>${day}</td>
-          ${members.map(member => `
-            <td>
-              <input type="number" id="${member}-day-${day}" value="${savedData[member]?.[day - 1] || 0}" onchange="saveMeal('${member}', ${day})" min="0" style="width: 60px; text-align: center;">
-            </td>`).join("")}
-          <td id="day-total-${day}">0</td>
-        </tr>`;
+    }
+    function saveUsers(users) {
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+    function getUsers() {
+      const users = localStorage.getItem("users");
+      return users ? JSON.parse(users) : [];
+    }
+    function updateRealTimeClock() {
+      document.getElementById("real-time-clock").textContent = new Date().toLocaleTimeString();
+    }
+    setInterval(updateRealTimeClock, 1000);
+    
+    /***** Dark Mode Schedule *****/
+    function applyDarkModeSchedule() {
+      const hour = new Date().getHours();
+      if (hour >= darkModeHour) {
+        document.body.classList.add("dark-theme");
+              document.getElementById("theme-toggle").checked = true;
+      } else {
+        document.body.classList.remove("dark-theme");
+        document.getElementById("theme-toggle").checked = false;
       }
-
-      tableHTML += `<tr class="total-row">
-        <td>মোট</td>
-        ${members.map(member => `<td id="${member}-total">0</td>`).join("")}
-        <td id="grand-total">0</td>
-      </tr></table>`;
-
-      tableContainer.innerHTML = tableHTML;
     }
-
-    function saveMeal(member, day) {
-      const selectedMonth = document.getElementById("month").value;
-      const savedData = loadFromStorage(selectedMonth);
-
-      if (!savedData[member]) savedData[member] = [];
-      const value = parseFloat(document.getElementById(`${member}-day-${day}`).value) || 0;
-      savedData[member][day - 1] = value;
-
-      saveToStorage(selectedMonth, savedData);
+    setInterval(applyDarkModeSchedule, 60000);
+    
+    /***** Auto Logout After Inactivity *****/
+    function resetLogoutTimer() {
+      clearTimeout(logoutTimer);
+      logoutTimer = setTimeout(() => {
+        alert("Logged out due to inactivity.");
+        location.reload();
+      }, autoLogoutTimeout * 60000);
     }
-
-    function calculateTotal() {
-      const selectedMonth = document.getElementById("month").value;
-      const savedData = loadFromStorage(selectedMonth);
-
-      let grandTotal = 0;
-
-      members.forEach(member => {
-        const memberTotal = (savedData[member] || []).reduce((sum, val) => sum + val, 0);
-        document.getElementById(`${member}-total`).innerText = memberTotal;
-        grandTotal += memberTotal;
+    document.addEventListener("mousemove", resetLogoutTimer);
+    document.addEventListener("keydown", resetLogoutTimer);
+    
+    /***** User Management *****/
+    function registerUser(username, password, role) {
+      let users = getUsers();
+      if (users.find(u => u.username === username)) {
+        alert("User already exists.");
+        return false;
+      }
+      users.push({ username, password, role });
+      saveUsers(users);
+      return true;
+    }
+    function loginUser(username, password) {
+      let users = getUsers();
+      return users.find(u => u.username === username && u.password === password);
+    }
+    function resetUserPassword(username, newPassword) {
+      let users = getUsers();
+      const user = users.find(u => u.username === username);
+      if (user) {
+        user.password = newPassword;
+        saveUsers(users);
+        return true;
+      }
+      return false;
+    }
+    
+    /***** UI Toggling for Auth Forms *****/
+    document.getElementById("show-register").addEventListener("click", function(e) {
+      e.preventDefault();
+      document.getElementById("login-form-container").style.display = "none";
+      document.getElementById("register-form-container").style.display = "block";
+    });
+    document.getElementById("show-login").addEventListener("click", function(e) {
+      e.preventDefault();
+      document.getElementById("register-form-container").style.display = "none";
+      document.getElementById("login-form-container").style.display = "block";
+    });
+    document.getElementById("reset-password-link").addEventListener("click", function(e) {
+      e.preventDefault();
+      document.getElementById("login-form-container").style.display = "none";
+      document.getElementById("reset-password-container").style.display = "block";
+    });
+    document.getElementById("back-to-login-from-reset").addEventListener("click", function(e) {
+      e.preventDefault();
+      document.getElementById("reset-password-container").style.display = "none";
+      document.getElementById("login-form-container").style.display = "block";
+    });
+    
+    /***** Registration Form Handler *****/
+    document.getElementById("register-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const inputs = this.querySelectorAll("input, select");
+      const username = inputs[0].value;
+      const password = inputs[1].value;
+      const role = inputs[2].value;
+      if (registerUser(username, password, role)) {
+        alert("Registration successful. Please login.");
+        document.getElementById("register-form-container").style.display = "none";
+        document.getElementById("login-form-container").style.display = "block";
+        logActivity(`User ${username} registered as ${role}.`);
+      }
+    });
+    
+    /***** Login Form Handler *****/
+    document.getElementById("login-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const inputs = this.querySelectorAll("input");
+      const username = inputs[0].value;
+      const password = inputs[1].value;
+      const user = loginUser(username, password);
+      if (user) {
+        currentUser = user;
+        const storedMessData = localStorage.getItem("messData_" + currentUser.username);
+        if (storedMessData) {
+          messData = JSON.parse(storedMessData);
+          mealEntryIdCounter = messData.mealEntries.length ? Math.max(...messData.mealEntries.map(e => e.id)) + 1 : 0;
+          expenseEntryIdCounter = messData.expenseEntries.length ? Math.max(...messData.expenseEntries.map(e => e.id)) + 1 : 0;
+        } else {
+          messData = null;
+        }
+        document.getElementById("auth-section").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        document.getElementById("user-info").style.display = "block";
+        document.getElementById("welcome-user").textContent = `Welcome, ${currentUser.username} (${currentUser.role})`;
+        logActivity(`User ${currentUser.username} logged in.`);
+        resetLogoutTimer();
+        if (messData === null) {
+          document.getElementById("mess-setup-section").style.display = "block";
+        } else {
+          document.getElementById("mess-setup-section").style.display = "none";
+          document.getElementById("main-dashboard").style.display = "block";
+          populateMealInputs();
+          populateExpenseMemberSelect();
+          updateMealLogTable();
+          updateExpenseLogTable();
+          updateMonthlyReport();
+          updateChart();
+          updateSummaryWidgets();
+          updateCalendarView();
+          loadPerformanceMetrics();
+        }
+      } else {
+        alert("Invalid credentials");
+      }
+    });
+    
+    /***** Google Login Simulation *****/
+    document.getElementById("google-login-btn").addEventListener("click", function() {
+      alert("Simulated Google Login");
+      currentUser = { username: "googleUser", role: "user" };
+      messData = null;
+      document.getElementById("auth-section").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      document.getElementById("user-info").style.display = "block";
+      document.getElementById("welcome-user").textContent = `Welcome, ${currentUser.username} (${currentUser.role})`;
+      logActivity(`User ${currentUser.username} logged in via Google.`);
+    });
+    
+    /***** Reset Password Handler *****/
+    document.getElementById("reset-password-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const username = document.getElementById("reset-username").value;
+      const newPassword = document.getElementById("new-password").value;
+      if (resetUserPassword(username, newPassword)) {
+        alert("Password reset successful.");
+        document.getElementById("reset-password-container").style.display = "none";
+        document.getElementById("login-form-container").style.display = "block";
+        logActivity(`Password reset for ${username}.`);
+      } else {
+        alert("User not found.");
+      }
+    });
+    
+    /***** Mess Setup Handler *****/
+    document.getElementById("mess-setup-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const messName = document.getElementById("mess-name").value;
+      const memberNamesText = document.getElementById("member-names").value;
+      const names = memberNamesText.split("\n").map(n => n.trim()).filter(n => n);
+      messData = {
+        messName: messName,
+        members: names.map(name => ({ name: name, mealTotal: 0, marketTotal: 0, favorite: false })),
+        mealEntries: [],
+        expenseEntries: []
+      };
+      saveMessData();
+      document.getElementById("mess-setup-section").style.display = "none";
+    document.getElementById("main-dashboard").style.display = "block";
+      populateMealInputs();
+      populateExpenseMemberSelect();
+      updateMealLogTable();
+      updateExpenseLogTable();
+      updateMonthlyReport();
+      updateChart();
+      updateSummaryWidgets();
+      updateCalendarView();
+      logActivity(`Mess "${messName}" setup completed.`);
+    });
+    
+    /***** Populate Meal Inputs (for each member) *****/
+    function populateMealInputs() {
+      const container = document.getElementById("meal-inputs");
+      container.innerHTML = "";
+      messData.members.forEach((member, index) => {
+        const div = document.createElement("div");
+        div.classList.add("meal-input-group");
+        div.innerHTML = `<strong>${member.name}</strong><br>
+          Morning: <input type="number" id="meal-morning-${index}" value="0" min="0" style="width:60px;">
+          Noon: <input type="number" id="meal-noon-${index}" value="0" min="0" style="width:60px;">
+          Dinner: <input type="number" id="meal-dinner-${index}" value="0" min="0" style="width:60px;">`;
+        container.appendChild(div);
       });
-
-      document.getElementById("grand-total").innerText = grandTotal;
-      totalSummary.innerHTML = `মোট মিল: ${grandTotal}`;
     }
-
-    function generatePDF() {
-  const element = document.getElementById("table-container");
-  const opt = {
-    margin:       [0.1, 0.1, 0.1, 0.1], // উপরে, নীচে, বাম, ডান মার্জিন
-    filename:     'meal-report.pdf',
-    image:        { type: 'png', quality: 0.3 }, // PNG ইমেজ এবং পূর্ণ গুণমান
-    html2canvas:  { scale: 4 },
-    jsPDF:        { unit: 'in', format: [20, 11.25], orientation: 'landscape' } // কাস্টম সাইজ
-  };
-
-  // Create PDF
-  html2pdf().from(element).set(opt).save();
-}
-
-    function generateChart() {
-      const selectedMonth = document.getElementById("month").value;
-      const savedData = loadFromStorage(selectedMonth);
-
-      const chartData = members.map(member => {
-        return (savedData[member] || []).reduce((sum, val) => sum + val, 0);
+    
+    /***** Populate Expense Member Select *****/
+    function populateExpenseMemberSelect() {
+      const select = document.getElementById("expense-member");
+      select.innerHTML = "";
+      messData.members.forEach((member, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = member.name;
+        select.appendChild(option);
       });
-
-      const ctx = document.getElementById("mealChart").getContext("2d");
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: members,
-          datasets: [{
-            label: 'মোট মিল',
-            data: chartData,
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
+    }
+    
+    /***** Meal Form Submission Handler *****/
+    document.getElementById("meal-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const date = document.getElementById("meal-date").value;
+      const remarks = document.getElementById("meal-remarks").value;
+      messData.members.forEach((member, index) => {
+        const morning = parseFloat(document.getElementById("meal-morning-" + index).value) || 0;
+        const noon = parseFloat(document.getElementById("meal-noon-" + index).value) || 0;
+        const dinner = parseFloat(document.getElementById("meal-dinner-" + index).value) || 0;
+        const total = morning * mealRates.morning + noon * mealRates.noon + dinner * mealRates.dinner;
+        const entry = {
+          id: mealEntryIdCounter++,
+          date: date,
+          memberIndex: index,
+          morning: morning,
+          noon: noon,
+          dinner: dinner,
+          total: total,
+          remarks: remarks,
+          comments: "",
+          rating: 0
+        };
+        messData.mealEntries.push(entry);
+        messData.members[index].mealTotal += total;
+      });
+      saveMessData();
+      updateMealLogTable();
+      updateMonthlyReport();
+      updateChart();
+      updateSummaryWidgets();
+      updateCalendarView();
+      logActivity(`Meal entry added for date ${date}.`);
+      document.getElementById("meal-date").value = "";
+      document.getElementById("meal-remarks").value = "";
+      messData.members.forEach((member, index) => {
+        document.getElementById("meal-morning-" + index).value = 0;
+        document.getElementById("meal-noon-" + index).value = 0;
+        document.getElementById("meal-dinner-" + index).value = 0;
+      });
+    });
+    
+    /***** Expense Form Submission Handler *****/
+    document.getElementById("expense-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const date = document.getElementById("expense-date").value;
+      const memberIndex = parseInt(document.getElementById("expense-member").value);
+      const amount = parseFloat(document.getElementById("expense-amount").value) || 0;
+      const category = document.getElementById("expense-category").value;
+      const remarks = document.getElementById("expense-remarks").value;
+      const tags = ""; // Placeholder for custom tags feature
+      const entry = {
+        id: expenseEntryIdCounter++,
+        date: date,
+        memberIndex: memberIndex,
+        amount: amount,
+        category: category,
+        remarks: remarks,
+        tags: tags
+      };
+      messData.expenseEntries.push(entry);
+      messData.members[memberIndex].marketTotal += amount;
+      saveMessData();
+      updateExpenseLogTable();
+      updateMonthlyReport();
+      updateSummaryWidgets();
+      logActivity(`Expense entry added for date ${date}.`);
+      document.getElementById("expense-date").value = "";
+      document.getElementById("expense-amount").value = "";
+      document.getElementById("expense-remarks").value = "";
+    });
+    
+    /***** Filtering and Searching in Logs *****/
+    document.getElementById("meal-filter-date").addEventListener("change", updateMealLogTable);
+    document.getElementById("meal-search").addEventListener("input", updateMealLogTable);
+    document.getElementById("expense-filter-date").addEventListener("change", updateExpenseLogTable);
+    document.getElementById("expense-search").addEventListener("input", updateExpenseLogTable);
+    
+    /***** Update Meal Log Table *****/
+    function updateMealLogTable() {
+      const tbody = document.getElementById("meal-log-table").querySelector("tbody");
+      tbody.innerHTML = "";
+      const filterDate = document.getElementById("meal-filter-date").value;
+      const searchTerm = document.getElementById("meal-search").value.toLowerCase();
+      messData.mealEntries.forEach(entry => {
+        if (filterDate && entry.date !== filterDate) return;
+        const memberName = messData.members[entry.memberIndex].name.toLowerCase();
+        if (searchTerm && !memberName.includes(searchTerm)) return;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${entry.date}</td>
+          <td>${messData.members[entry.memberIndex].name}</td>
+          <td>${entry.morning}</td>
+          <td>${entry.noon}</td>
+          <td>${entry.dinner}</td>
+          <td>${entry.total.toFixed(2)}</td>
+          <td>${entry.remarks || ""}</td>
+          <td>${entry.comments || ""}</td>
+          <td>${entry.rating}</td>
+          <td>
+            <button onclick="editMealEntry(${entry.id})">Edit</button>
+            <button onclick="confirmDeletion('meal', ${entry.id})">Delete</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    
+    window.editMealEntry = function(id) {
+      const entry = messData.mealEntries.find(e => e.id === id);
+      if (entry) {
+        document.getElementById("meal-date").value = entry.date;
+        document.getElementById("meal-remarks").value = entry.remarks;
+        document.getElementById("meal-morning-" + entry.memberIndex).value = entry.morning;
+        document.getElementById("meal-noon-" + entry.memberIndex).value = entry.noon;
+        document.getElementById("meal-dinner-" + entry.memberIndex).value = entry.dinner;
+        messData.members[entry.memberIndex].mealTotal -= entry.total;
+        messData.mealEntries = messData.mealEntries.filter(e => e.id !== id);
+        saveMessData();
+        updateMealLogTable();
+        updateMonthlyReport();
+        updateChart();
+        updateSummaryWidgets();
+        logActivity(`Meal entry edited for date ${entry.date}.`);
+      }
+    };
+    
+    /***** Update Expense Log Table *****/
+    function updateExpenseLogTable() {
+      const tbody = document.getElementById("expense-log-table").querySelector("tbody");
+      tbody.innerHTML = "";
+      const filterDate = document.getElementById("expense-filter-date").value;
+      const searchTerm = document.getElementById("expense-search").value.toLowerCase();
+      messData.expenseEntries.forEach(entry => {
+        if (filterDate && entry.date !== filterDate) return;
+        const memberName = messData.members[entry.memberIndex].name.toLowerCase();
+        if (searchTerm && !memberName.includes(searchTerm)) return;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${entry.date}</td>
+          <td>${messData.members[entry.memberIndex].name}</td>
+          <td>${entry.amount.toFixed(2)}</td>
+          <td>${entry.category}</td>
+          <td>${entry.remarks || ""}</td>
+          <td>${entry.tags || ""}</td>
+          <td>
+            <button onclick="editExpenseEntry(${entry.id})">Edit</button>
+            <button onclick="confirmDeletion('expense', ${entry.id})">Delete</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    
+    window.editExpenseEntry = function(id) {
+      const entry = messData.expenseEntries.find(e => e.id === id);
+      if (entry) {
+        document.getElementById("expense-date").value = entry.date;
+        document.getElementById("expense-member").value = entry.memberIndex;
+        document.getElementById("expense-amount").value = entry.amount;
+        document.getElementById("expense-category").value = entry.category;
+        document.getElementById("expense-remarks").value = entry.remarks;
+        messData.members[entry.memberIndex].marketTotal -= entry.amount;
+        messData.expenseEntries = messData.expenseEntries.filter(e => e.id !== id);
+        saveMessData();
+        updateExpenseLogTable();
+        updateMonthlyReport();
+        updateSummaryWidgets();
+        logActivity(`Expense entry edited for date ${entry.date}.`);
+      }
+    };
+    
+    /***** Confirmation Modal for Deletion *****/
+    function confirmDeletion(type, id) {
+      const modal = document.getElementById("confirm-modal");
+      modal.style.display = "flex";
+document.getElementById("confirm-yes-btn").onclick = function() {
+        if (type === "meal") {
+          deleteMealEntry(id);
+        } else if (type === "expense") {
+          deleteExpenseEntry(id);
+        }
+        modal.style.display = "none";
+      };
+      document.getElementById("confirm-no-btn").onclick = function() {
+        modal.style.display = "none";
+      };
+    }
+    
+    function deleteMealEntry(id) {
+      const entry = messData.mealEntries.find(e => e.id === id);
+      if (entry) {
+        messData.members[entry.memberIndex].mealTotal -= entry.total;
+        messData.mealEntries = messData.mealEntries.filter(e => e.id !== id);
+        lastDeleted = { type: 'meal', data: entry };
+        saveMessData();
+        updateMealLogTable();
+        updateMonthlyReport();
+        updateChart();
+        updateSummaryWidgets();
+        logActivity(`Meal entry deleted for date ${entry.date}.`);
+        showUndoOption();
+      }
+    }
+    function deleteExpenseEntry(id) {
+      const entry = messData.expenseEntries.find(e => e.id === id);
+      if (entry) {
+        messData.members[entry.memberIndex].marketTotal -= entry.amount;
+        messData.expenseEntries = messData.expenseEntries.filter(e => e.id !== id);
+        lastDeleted = { type: 'expense', data: entry };
+        saveMessData();
+        updateExpenseLogTable();
+        updateMonthlyReport();
+        updateSummaryWidgets();
+        logActivity(`Expense entry deleted for date ${entry.date}.`);
+        showUndoOption();
+      }
+    }
+    function showUndoOption() {
+      showNotification("Entry deleted. Click here to undo.");
+      document.getElementById("notification").onclick = function() {
+        if (lastDeleted) {
+          if (lastDeleted.type === "meal") {
+            messData.mealEntries.push(lastDeleted.data);
+            messData.members[lastDeleted.data.memberIndex].mealTotal += lastDeleted.data.total;
+            updateMealLogTable();
+          } else if (lastDeleted.type === "expense") {
+            messData.expenseEntries.push(lastDeleted.data);
+            messData.members[lastDeleted.data.memberIndex].marketTotal += lastDeleted.data.amount;
+            updateExpenseLogTable();
           }
+          saveMessData();
+          updateMonthlyReport();
+          updateSummaryWidgets();
+          logActivity("Deletion undone.");
+          lastDeleted = null;
+          document.getElementById("notification").onclick = null;
+        }
+      };
+    }
+    
+    /***** Update Monthly Report *****/
+    function updateMonthlyReport() {
+      const tbody = document.getElementById("monthly-report-table").querySelector("tbody");
+      tbody.innerHTML = "";
+      messData.members.forEach(member => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${member.name}</td>
+          <td>${member.mealTotal.toFixed(2)}</td>
+          <td>${member.marketTotal.toFixed(2)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    
+    /***** Chart Section: Meal and Expense Charts *****/
+    let mealChart = null;
+    let expenseChart = null;
+    function updateChart() {
+      const ctxMeal = document.getElementById("mealChart").getContext("2d");
+      const labels = messData.members.map(member => member.name);
+      const dataMeals = messData.members.map(member => member.mealTotal);
+      if (mealChart) {
+        mealChart.data.labels = labels;
+        mealChart.data.datasets[0].data = dataMeals;
+        mealChart.update();
+      } else {
+        mealChart = new Chart(ctxMeal, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Meal Totals',
+              data: dataMeals,
+              backgroundColor: 'rgba(0, 123, 255, 0.5)',
+              borderColor: 'rgba(0, 123, 255, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: { scales: { y: { beginAtZero: true } } }
+        });
+      }
+      
+      // Expense Chart: Line Chart (Expense over time)
+      const ctxExpense = document.getElementById("expenseChart").getContext("2d");
+      const expenseData = {};
+      messData.expenseEntries.forEach(entry => {
+        expenseData[entry.date] = (expenseData[entry.date] || 0) + entry.amount;
+      });
+      const expenseDates = Object.keys(expenseData).sort();
+      const expenseAmounts = expenseDates.map(date => expenseData[date]);
+      if (expenseChart) {
+        expenseChart.data.labels = expenseDates;
+        expenseChart.data.datasets[0].data = expenseAmounts;
+        expenseChart.update();
+      } else {
+        expenseChart = new Chart(ctxExpense, {
+          type: 'line',
+          data: {
+            labels: expenseDates,
+            datasets: [{
+              label: 'Expenses Over Time',
+              data: expenseAmounts,
+              backgroundColor: 'rgba(220, 53, 69, 0.5)',
+              borderColor: 'rgba(220, 53, 69, 1)',
+              fill: false,
+              tension: 0.1
+            }]
+          },
+          options: { scales: { y: { beginAtZero: true } } }
+        });
+      }
+    }
+    
+    /***** Data Management: Export/Import *****/
+    document.getElementById("export-data-btn").addEventListener("click", function() {
+      const dataStr = JSON.stringify(messData, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "messData.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+    document.getElementById("backup-data-btn").addEventListener("click", function() {
+      alert("Data backed up to cloud (simulated).");
+    });
+    document.getElementById("import-data-input").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const importedData = JSON.parse(e.target.result);
+            messData = importedData;
+            mealEntryIdCounter = messData.mealEntries.length ? Math.max(...messData.mealEntries.map(e => e.id)) + 1 : 0;
+            expenseEntryIdCounter = messData.expenseEntries.length ? Math.max(...messData.expenseEntries.map(e => e.id)) + 1 : 0;
+            saveMessData();
+            populateMealInputs();
+            populateExpenseMemberSelect();
+            updateMealLogTable();
+            updateExpenseLogTable();
+            updateMonthlyReport();
+            updateChart();
+            updateSummaryWidgets();
+            updateCalendarView();
+            logActivity("Data imported successfully.");
+            alert("Data imported successfully.");
+          } catch (err) {
+            alert("Invalid JSON file.");
+          }
+        };
+        reader.readAsText(file);
+      }
+    });
+    
+    /***** Export Monthly Report to PDF *****/
+    document.getElementById("export-pdf-btn").addEventListener("click", function() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Monthly Report", 10, 10);
+      let y = 20;
+      messData.members.forEach(member => {
+        doc.text(`${member.name} - Meals: ${member.mealTotal.toFixed(2)}, Expense: ${member.marketTotal.toFixed(2)}`, 10, y);
+        y += 10;
+      });
+      doc.save("Monthly_Report.pdf");
+    });
+    
+    /***** Download CSV of Transaction History *****/
+    document.getElementById("download-csv-btn").addEventListener("click", function() {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Type,Date,Member,Amount,Remarks\n";
+      messData.mealEntries.forEach(entry => {
+        csvContent += `Meal,${entry.date},${messData.members[entry.memberIndex].name},${entry.total.toFixed(2)},${entry.remarks}\n`;
+      });
+      messData.expenseEntries.forEach(entry => {
+        csvContent += `Expense,${entry.date},${messData.members[entry.memberIndex].name},${entry.amount.toFixed(2)},${entry.remarks}\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const a = document.createElement("a");
+      a.href = encodedUri;
+      a.download = "transaction_history.csv";
+      a.click();
+    });
+    
+    /***** Summary Widgets Update *****/
+    function updateSummaryWidgets() {
+      const container = document.getElementById("summary-widgets");
+      let totalMeals = messData.members.reduce((sum, m) => sum + m.mealTotal, 0);
+      let totalExpense = messData.members.reduce((sum, m) => sum + m.marketTotal, 0);
+      let mealDays = new Set(messData.mealEntries.map(e => e.date)).size || 1;
+      let expenseDays = new Set(messData.expenseEntries.map(e => e.date)).size || 1;
+      let avgMeal = (totalMeals / mealDays).toFixed(2);
+      let avgExpense = (totalExpense / expenseDays).toFixed(2);
+      container.innerHTML = `
+        <div class="widget">Total Meals<br>${totalMeals.toFixed(2)}</div>
+        <div class="widget">Total Expense<br>${totalExpense.toFixed(2)}</div>
+        <div class="widget">Meal Entries<br>${messData.mealEntries.length}</div>
+        <div class="widget">Expense Entries<br>${messData.expenseEntries.length}</div>
+        <div class="widget">Avg Meal/Day<br>${avgMeal}</div>
+        <div class="widget">Avg Expense/Day<br>${avgExpense}</div>
+      `;
+    }
+    
+    /***** Calendar View *****/
+    function updateCalendarView() {
+      const container = document.getElementById("calendar-view");
+      container.innerHTML = "";
+      const dates = [...new Set(messData.mealEntries.map(e => e.date))];
+      dates.forEach(date => {
+        const div = document.createElement("div");
+        div.classList.add("calendar-day");
+        div.textContent = date;
+        container.appendChild(div);
+      });
+    }
+    
+    /***** Settings: Meal Rates, Auto Logout, Dark Mode, etc. *****/
+    document.getElementById("meal-rates-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      mealRates.morning = parseFloat(document.getElementById("morning-rate").value) || 0.5;
+      mealRates.noon = parseFloat(document.getElementById("noon-rate").value) || 1;
+      mealRates.dinner = parseFloat(document.getElementById("dinner-rate").value) || 1;
+      updateMealLogTable();
+      updateMonthlyReport();
+      updateChart();
+      updateSummaryWidgets();
+      logActivity("Meal rates updated.");
+      showNotification("Meal rates updated.");
+    });
+document.getElementById("reset-monthly-btn").addEventListener("click", function() {
+      if (confirm("Are you sure to reset monthly totals?")) {
+        messData.members.forEach(member => { member.mealTotal = 0; member.marketTotal = 0; });
+        messData.mealEntries = [];
+        messData.expenseEntries = [];
+        saveMessData();
+        updateMealLogTable();
+        updateExpenseLogTable();
+        updateMonthlyReport();
+        updateChart();
+        updateSummaryWidgets();
+        updateCalendarView();
+        logActivity("Monthly totals reset.");
+        showNotification("Monthly totals have been reset.");
+      }
+    });
+    document.getElementById("save-logout-settings-btn").addEventListener("click", function() {
+      autoLogoutTimeout = parseInt(document.getElementById("auto-logout-time").value) || 5;
+      logActivity("Auto logout timeout updated.");
+      showNotification("Auto logout settings saved.");
+    });
+    document.getElementById("save-dark-mode-schedule-btn").addEventListener("click", function() {
+      darkModeHour = parseInt(document.getElementById("dark-mode-hour").value) || 18;
+      logActivity("Dark mode schedule updated.");
+      showNotification("Dark mode schedule saved.");
+    });
+    document.getElementById("primary-color-picker").addEventListener("change", function() {
+      document.documentElement.style.setProperty("--primary-color", this.value);
+      logActivity("Theme color updated.");
+      showNotification("Theme color changed.");
+    });
+    document.getElementById("convert-currency-btn").addEventListener("click", function() {
+      alert("Currency conversion simulated.");
+      logActivity("Currency conversion simulated.");
+    });
+    document.getElementById("toggle-comments-col").addEventListener("change", function() {
+      const display = this.checked ? "" : "none";
+      document.querySelectorAll("#meal-log-table th:nth-child(8), #meal-log-table td:nth-child(8)").forEach(el => el.style.display = display);
+    });
+    document.getElementById("toggle-rating-col").addEventListener("change", function() {
+      const display = this.checked ? "" : "none";
+      document.querySelectorAll("#meal-log-table th:nth-child(9), #meal-log-table td:nth-child(9)").forEach(el => el.style.display = display);
+    });
+    
+    /***** Profile Update *****/
+    document.getElementById("profile-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const newPassword = document.getElementById("profile-password").value;
+      if (newPassword) {
+        let users = getUsers();
+        const user = users.find(u => u.username === currentUser.username);
+        if (user) {
+          user.password = newPassword;
+          saveUsers(users);
+          logActivity(`User ${currentUser.username} updated profile password.`);
+          showNotification("Profile updated successfully.");
+          document.getElementById("profile-password").value = "";
+        }
+      }
+    });
+    document.getElementById("profile-link").addEventListener("click", function() {
+      switchTab("profile-tab");
+      document.getElementById("profile-username").value = currentUser.username;
+    });
+    document.getElementById("logout-link").addEventListener("click", function() {
+      currentUser = null;
+      location.reload();
+    });
+    document.getElementById("profile-avatar").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.getElementById("profile-avatar-preview");
+          img.src = e.target.result;
+          img.style.display = "block";
+          logActivity("Profile picture updated.");
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    /***** Tab Navigation *****/
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    tabButtons.forEach(button => {
+      button.addEventListener("click", function() {
+        switchTab(this.getAttribute("data-tab"));
+      });
+    });
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-section").forEach(section => section.classList.remove("active-tab"));
+      document.getElementById(tabId).classList.add("active-tab");
+    }
+    
+    /***** Sortable Table Columns *****/
+    document.querySelectorAll("th.sortable").forEach(th => {
+      th.addEventListener("click", function() {
+        const sortKey = this.getAttribute("data-sort");
+        if (this.parentNode.parentNode.parentNode.id === "meal-log-table") {
+          messData.mealEntries.sort((a, b) => a[sortKey] > b[sortKey] ? 1 : -1);
+          updateMealLogTable();
+        } else if (this.parentNode.parentNode.parentNode.id === "expense-log-table") {
+          messData.expenseEntries.sort((a, b) => a[sortKey] > b[sortKey] ? 1 : -1);
+          updateExpenseLogTable();
         }
       });
+    });
+    
+    /***** Chat System (Additional Feature) *****/
+    document.getElementById("send-chat-btn").addEventListener("click", function() {
+      const msg = document.getElementById("chat-input").value;
+      if (msg) {
+        const chatMessages = document.getElementById("chat-messages");
+        const newMsg = document.createElement("div");
+        newMsg.textContent = `${currentUser.username}: ${msg}`;
+        chatMessages.appendChild(newMsg);
+        document.getElementById("chat-input").value = "";
+        logActivity(`Chat message sent: ${msg}`);
+      }
+    });
+    
+    /***** Budgeting System (Additional Feature) *****/
+    document.getElementById("budget-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const budget = parseFloat(document.getElementById("monthly-budget").value) || 0;
+      document.getElementById("budget-summary").textContent = `Your monthly budget is set to ${budget.toFixed(2)}.`;
+      logActivity("Budget set to " + budget.toFixed(2));
+    });
+    
+    /***** Contact Form (Additional Feature) *****/
+    document.getElementById("contact-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      alert("Your message has been sent. (Simulated)");
+      logActivity("Contact form submitted.");
+    });
+    
+    /***** Feedback Form (Additional Feature) *****/
+    document.getElementById("feedback-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      alert("Thank you for your feedback. (Simulated)");
+      logActivity("Feedback submitted.");
+    });
+    
+    /***** Performance Metrics (Additional Feature) *****/
+    function loadPerformanceMetrics() {
+      const container = document.getElementById("performance-metrics");
+      container.innerHTML = "<p>Performance metrics: (Simulated)</p><p>Response Time: 120ms</p><p>Load Time: 2.3s</p>";
     }
+    
+    /***** Simulated Real-Time Sync and Push Notifications (Additional Feature) *****/
+    setInterval(() => {
+      showNotification("Real-time sync simulated.");
+      logActivity("Real-time sync executed.");
+    }, 30000);
+    
+    /***** Simulated Weekly Summary Email (Additional Feature) *****/
+    function sendWeeklySummary() {
+      alert("Weekly summary email sent. (Simulated)");
+      logActivity("Weekly summary email sent.");
+    }
+    
+    /***** Additional Tabs: Help/FAQ, Live Support Chat, Social Login, Map Integration, etc. *****/
+    // News Feed, Help/FAQ, Contact, Feedback, and Map tabs are implemented as above.
+    
+    /***** Initialize Real-Time Clock and Dark Mode Schedule *****/
+    updateRealTimeClock();
+    applyDarkModeSchedule();
+    
+    /***** Dark Mode Toggle *****/
+    document.getElementById("theme-toggle").addEventListener("change", function() {
+      if (this.checked) {
+        document.body.classList.add("dark-theme");
+      } else {
+        document.body.classList.remove("dark-theme");
+      }
+    });
+    
+    /***** Automatic Initializations *****/
+    // (Language settings, etc. can be applied here.)
   </script>
-
-  <!-- Footer -->
-  <footer>
-    <p>©  2925 মেস ম্যানেজমেন্ট | সর্বস্বত্ব সংরক্ষিত</p>
-  </footer>
 </body>
 </html>
+   
