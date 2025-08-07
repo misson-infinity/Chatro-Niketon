@@ -1,0 +1,17 @@
+{
+  "name": "মেস ম্যানেজমেন্ট সিস্টেম",
+  "short_name": "MessApp",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4A90E2",
+  "description": "A web application for managing mess activities.",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "gcm_sender_id": "952752280975"
+}
